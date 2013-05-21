@@ -10,27 +10,39 @@
 
 #import "BirdsDetailViewController.h"
 
+#import "BirdSightingDataController.h"
+
+#import "BirdSighting.h"
+
+/*
 @interface BirdsMasterViewController () {
     NSMutableArray *_objects;
 }
 @end
+
+ */
 
 @implementation BirdsMasterViewController
 
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+    self.dataController = [[BirdSightingDataController alloc] init];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    /*
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
     self.navigationItem.rightBarButtonItem = addButton;
+     */
 }
+     
 
 - (void)didReceiveMemoryWarning
 {
@@ -38,6 +50,7 @@
     // Dispose of any resources that can be recreated.
 }
 
+/*
 - (void)insertNewObject:(id)sender
 {
     if (!_objects) {
@@ -47,6 +60,7 @@
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
+*/
 
 #pragma mark - Table View
 
@@ -57,24 +71,38 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return _objects.count;
+    return [self.dataController countofList];
 }
 
+
+//create a new cell from the prototype and populate it with data from the appropriate BirdSighting object.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-
-    NSDate *object = _objects[indexPath.row];
-    cell.textLabel.text = [object description];
+    
+    static NSString *CellIdentifier = @"BirdSightingCell";
+    
+    static NSDateFormatter *formatter = nil;
+    if (formatter == nil)
+    {
+        formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateStyle:NSDateFormatterMediumStyle];
+    }
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
+    BirdSighting *sightingAtIndex = [self.dataController objectInListAtIndex:indexPath.row];
+    [[cell textLabel] setText:sightingAtIndex.name];
+    [[cell detailTextLabel] setText:[formatter stringFromDate:(NSDate *)sightingAtIndex.date]];
     return cell;
 }
+
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return NO if you do not want the specified item to be editable.
-    return YES;
+    return NO;
 }
 
+/*
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -84,6 +112,7 @@
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
     }
 }
+*/
 
 /*
 // Override to support rearranging the table view.
@@ -103,10 +132,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSDate *object = _objects[indexPath.row];
-        [[segue destinationViewController] setDetailItem:object];
+    if ([[segue identifier] isEqualToString:@"ShowSightingDetails"])
+    {
+        BirdsDetailViewController *detailViewController = [segue destinationViewController];
+        
+        detailViewController.sighting = [self.dataController objectInListAtIndex:[self.tableView indexPathForSelectedRow].row];
     }
 }
 

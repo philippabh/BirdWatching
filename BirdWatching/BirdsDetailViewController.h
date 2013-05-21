@@ -8,9 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BirdsDetailViewController : UIViewController
+@class BirdSighting;
 
-@property (strong, nonatomic) id detailItem;
+@interface BirdsDetailViewController : UITableViewController /* using a table to display the bird sighting details provides a user experience that is consistent with the master scene */
 
-@property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
+@property (strong, nonatomic) BirdSighting *sighting;
+@property (weak, nonatomic) IBOutlet UILabel *birdNameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *locationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+
 @end
